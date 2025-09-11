@@ -1,4 +1,4 @@
-# rpi-pico-touchscreen-calculator
+# rpi-touchscreen-calculator
 Calculator with touchscreen using Raspberry Pi Pico board  
 original code that was modified: https://sspvc.lixis.cz/pmp/kalkulacka/kalkulacka-TFT-ILI9341-XPT2046.html  
 
