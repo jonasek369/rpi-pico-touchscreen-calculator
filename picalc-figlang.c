@@ -546,26 +546,27 @@ void button_close_parenth_click(void)
  // spuštění výpočtu
  void button_kalk_click(void)
  {
-     printf("Starting tokenization!\n");
+    TokenizerOutput to = {0};
+    int tokenization_error = tokenize(vyraz, &to);
+    if(tokenization_error){
+       button_clear_click();
+       return;
+    }
+    ExprNode* ast = generate_ast(to.tokens);
+    if(!ast){
+       button_clear_click();
+       return;
+    }
+    print_ast(ast, 0);
+    int64_t result = compute_ast(ast);
 
-     TokenizerOutput to = tokenize(vyraz);
-     ExprNode* ast = generate_ast(to.tokens);
-     if(!ast){
-        vyraz[0] = '\0';
-        i = 0;
-        UG_TextboxSetText(&window_1, TXB_ID_22, vyraz );
-        return;
-     }
-     print_ast(ast, 0);
-     float result = compute_ast(ast);
-
-     arrfree(to.tokens);
-     free(to.tokensValues);
-     free_ast(ast);
- 
-     sprintf(vyraz, "%g", result);
-     i = strlen(vyraz);
-     UG_TextboxSetText(&window_1, TXB_ID_22, vyraz );
+    arrfree(to.tokens);
+    free(to.tokensValues);
+    free_ast(ast);
+    
+    sprintf(vyraz, "%lld", result);
+    i = strlen(vyraz);
+    UG_TextboxSetText(&window_1, TXB_ID_22, vyraz );
  }
  
  

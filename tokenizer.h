@@ -35,6 +35,7 @@ bool can_be_in_number(char c){
 	}
 	return false;
 }
+
 #define OPERATOR_LENGTH 11
 const char* operator_characters = "><=-+*/&|!,";
 
@@ -173,6 +174,7 @@ Token lex_number(TokenizerState* state, bool* isTokenValid){
 	Token token = {0};
 	*isTokenValid = false;
 	size_t index_end = state->index;
+
 	while(state->source[index_end] != '\0' && can_be_in_number(state->source[index_end])){
 		index_end++;
 	}
@@ -263,22 +265,22 @@ Token lex_separator(TokenizerState* state, bool* isTokenValid){
 typedef Token (*LexTokenFunction)(TokenizerState* state, bool* isTokenValid);
 
 
-TokenizerOutput tokenize(const char* source){
-	TokenizerOutput output = {0};
-	output.tokens = NULL;
+int tokenize(const char* source, TokenizerOutput* output){
+	output->tokens = NULL;
 
 	// copying the data so we dont need to manage the source the user does
-	output.tokensValues = malloc(strlen(source)+1);
-	strcpy(output.tokensValues, source);
-	if(!output.tokensValues){
+	output->tokensValues = malloc(strlen(source)+1);
+	if(!output->tokensValues){
 		printf("Could not copy source!\n");
-		return output;
+		return 1;
 	}
+	strcpy(output->tokensValues, source);
+
 
 
 	TokenizerState state = {0};
 	state.index = 0;
-	state.source = output.tokensValues;
+	state.source = output->tokensValues;
 
 	LexTokenFunction lexing_functions[] = {
 		lex_keyword,
@@ -297,15 +299,16 @@ TokenizerOutput tokenize(const char* source){
    		for(size_t i = 0; i < sizeof(lexing_functions) / sizeof(lexing_functions[0]); i++){
 			Token tok = lexing_functions[i](&state, &isTokenValid);
 			if(isTokenValid){
-				arrput(output.tokens, tok);
+				arrput(output->tokens, tok);
 				break;
 			}
 		}
 		if(!isTokenValid){
+			printf("WARN: Encountered unknown char: %c\n", state.source[state.index]);
 			state.index++;
 		}
 	}
-	return output;
+	return 0;
 }
 
 

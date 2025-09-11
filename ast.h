@@ -131,23 +131,21 @@ ExprNode* generate_ast(Token* tokens){
 	return root; // Show be root now
 }
 
-int str_to_int(char* str, size_t size) {
-    int result = 0;
+int64_t str_to_int(char* str, size_t size) {
+    int64_t result = 0;
     bool negative = false;
     size_t i = 0;
 
-    if (size == 0 || str == NULL) return 0; // handle empty string or NULL
+    if (size == 0 || str == NULL) return 0;
 
-    // Handle optional leading minus
-    if (str[0] == '-') {
+	if (str[0] == '-') {
         negative = true;
         i = 1;
     }
 
     for (; i < size; i++) {
         if (str[i] < '0' || str[i] > '9') {
-            // Invalid character found, stop conversion
-            break;
+			break;
         }
         result = result * 10 + (str[i] - '0');
     }
@@ -155,7 +153,7 @@ int str_to_int(char* str, size_t size) {
     return negative ? -result : result;
 }
 
-float compute_ast(ExprNode* node){
+int64_t compute_ast(ExprNode* node){
     if(!node) {
         fprintf(stderr, "Invalid node\n");
         return 0;
@@ -163,11 +161,11 @@ float compute_ast(ExprNode* node){
 
     switch(node->op.type){
         case NUMBER:
-            return (float) str_to_int(node->op.value, node->op.size);
+            return str_to_int(node->op.value, node->op.size);
 
         case OPERATOR: {
-            float left = compute_ast(node->operand1);
-            float right = compute_ast(node->operand2);
+            int64_t left = compute_ast(node->operand1);
+            int64_t right = compute_ast(node->operand2);
 
             switch(node->op.token_info) {
                 case PLUS:  return left + right;
